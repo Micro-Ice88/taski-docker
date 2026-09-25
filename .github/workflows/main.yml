@@ -194,3 +194,18 @@ jobs:
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
             sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
+
+  send_message:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Send VK notification
+        env:
+          VK_TOKEN: ${{ secrets.VK_TOKEN }}
+          VK_USER_ID: ${{ secrets.VK_USER_ID }}  # число, например 123456789
+        run: |
+          curl -s -X POST "https://api.vk.com/method/messages.send" \
+            -d "access_token=${VK_TOKEN}" \
+            -d "user_id=${VK_USER_ID}" \
+            -d "message=Деплой успешно выполнен!" \
+            -d "v=5.131"
