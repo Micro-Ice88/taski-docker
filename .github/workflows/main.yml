@@ -202,10 +202,14 @@ jobs:
       - name: Send VK notification
         env:
           VK_TOKEN: ${{ secrets.VK_TOKEN }}
-          VK_USER_ID: ${{ secrets.VK_USER_ID }}  # число, например 123456789
+          VK_USER_ID: ${{ secrets.VK_USER_ID }}
         run: |
+          # Генерируем random_id как timestamp в миллисекундах
+          RANDOM_ID=$(date +%s%3N)
+
           curl -s -X POST "https://api.vk.com/method/messages.send" \
             -d "access_token=${VK_TOKEN}" \
             -d "user_id=${VK_USER_ID}" \
             -d "message=Деплой успешно выполнен!" \
+            -d "random_id=${RANDOM_ID}" \
             -d "v=5.131"
